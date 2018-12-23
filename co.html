@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<head>
+    <style>
+        table {
+            width: 100%;
+        }
+
+        td {
+            border-width: 1px;
+            border-style: solid;
+            border-color: chartreuse;
+            text-align: center;
+            width: cal(100%/6);
+        }
+
+        .header {
+            background-color: #2b8ee2;
+            color: white;
+            font-weight: bold;
+        }
+
+        body {
+            font-size: 18pt;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="reset()">Reset</button>
+    <script>
+        let resetClicked = 0;
+
+        function reset() {
+            resetClicked = resetClicked + 1;
+            if (resetClicked == 5) {
+                localStorage.removeItem("data");
+                alert("Data has just cleared");
+                location.reload(true);
+            }
+
+            if (resetClicked === 1) {
+                setTimeout(() => {
+                    resetClicked = 0;
+                }, 5000);
+            }
+        }
+
+        let tableAmount = 2;
+        let tableColumn = 6;
+        let totalNumbers = 5;
+        let maxNumber = 5;
+
+        function generateData() {
+            for (let i = 0; i < tableAmount; i = i + 1) {
+                let table = document.createElement("table");
+
+
+
+                for (let k = 0; k < 2; k = k + 1) {
+                    let row = document.createElement("tr");
+
+                    for (let h = 0; h < tableColumn; h = h + 1) {
+                        let column = document.createElement("td");
+
+                        if (k === 0) {
+                            column.className = "header";
+                            column.innerHTML = h;
+                            row.append(column);
+                            continue;
+                        }
+
+                        let exp = "";
+                        let totalVal = 0;
+                        for (let t = 0; t < totalNumbers; t = t + 1) {
+                            let num = Math.floor(Math.random() * maxNumber);
+
+                            //First number cannot be negative
+                            if (t === 0 && num % 2 > 0) {
+                                t = t - 1;
+                                continue;
+                            }
+
+                            // Calculate total of generated number
+                            if (num % 2 > 0) {
+                                totalVal = totalVal - num;
+                            } else {
+                                totalVal = totalVal + num;
+                            }
+
+                            // If current totalVal is smaller than zero then regenerate
+                            if (totalVal < 0) {
+                                t = 0;
+                                exp = "";
+                                totalVal = 0;
+                                continue;
+                            }
+
+                            // At the last loop, totalVal must be fit in range of 0 to maxNumber
+                            // Otherwise reset
+                            if (t === totalNumbers - 1 && (totalVal < 0 ||
+                                    totalVal >= maxNumber)) {
+                                t = 0;
+                                exp = "";
+                                totalVal = 0;
+                                continue;
+                            }
+
+                            exp = exp +
+                                `${num % 2 > 0 ? "-" : ""}${num}<br />`;
+                        }
+
+                        column.innerHTML = exp;
+
+                        row.append(column);
+                    }
+
+                    table.append(row);
+                }
+
+                body.append(table);
+
+                data = data + table.outerHTML;
+            }
+
+            localStorage.setItem("data", data);
+        };
+
+        let body = document.getElementsByTagName("body")[0];
+
+        let data = localStorage.getItem("data");
+        if (data && data !== "") {
+            body.append(document.createRange().createContextualFragment(data));
+        } else {
+            data = "";
+            generateData();
+        }
+    </script>
+</body>
