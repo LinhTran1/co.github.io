@@ -9,9 +9,14 @@
         td {
             border-width: 1px;
             border-style: solid;
-            border-color: chartreuse;
+            border-color: gray;
             text-align: center;
-            width: cal(100%/6);
+            width: 12.5%;
+        }
+
+        .countDownColumn {
+            color: red;
+            font-size: 30pt;
         }
 
         .header {
@@ -28,6 +33,7 @@
 
 <body>
     <button onclick="reset()">Reset</button>
+    <input id="deadline" type="number" placeholder="Deadline by minute" />
     <script>
         let resetClicked = 0;
 
@@ -51,11 +57,30 @@
         let totalNumbers = 5;
         let maxNumber = 5;
 
+        window.runningInterval = new Array(tableAmount);
+
+        function countDown(table, column) {
+            let td = document.getElementById(`cell${table}${column}`);
+            let deadline = document.getElementById(`deadline`);
+            td.innerText = `${parseInt(deadline.value) * 60}`;
+            let btn = document.getElementById(`btn${table}${column}`);
+            btn.disabled = true;
+            let si = setInterval((cell, tableIndex, startButton) => {
+                let i = parseInt(cell.innerText);
+                console.log(i);
+                if (i < 1) {
+                    i = 1;
+                    btn.disabled = false;
+                    clearInterval(window.runningInterval[tableIndex]);
+                }
+                cell.innerText = i - 1;
+            }, 1000, td, table, btn);
+            window.runningInterval.splice(table, 1, si);
+        };
+
         function generateData() {
             for (let i = 0; i < tableAmount; i = i + 1) {
                 let table = document.createElement("table");
-
-
 
                 for (let k = 0; k < 2; k = k + 1) {
                     let row = document.createElement("tr");
@@ -65,7 +90,7 @@
 
                         if (k === 0) {
                             column.className = "header";
-                            column.innerHTML = h;
+                            column.innerHTML = h + 1;
                             row.append(column);
                             continue;
                         }
@@ -115,10 +140,27 @@
                         row.append(column);
                     }
 
+                    if (k > 0) {
+                        let buttonColumn = document.createElement("td");
+                        let startButton = document.createElement("button");
+                        startButton.innerText = "Start";
+                        startButton.id = `btn${i}${k}`;
+                        startButton.onclick = () => {
+                            countDown(i, k);
+                        };
+                        buttonColumn.append(startButton);
+                        row.append(buttonColumn);
+
+                        let textColumn = document.createElement("td");
+                        textColumn.className = "countDownColumn";
+                        textColumn.id = `cell${i}${k}`;
+                        row.append(textColumn);
+                    }
+
                     table.append(row);
                 }
 
-                body.append(table);
+                body.prepend(table);
 
                 data = data + table.outerHTML;
             }
@@ -130,7 +172,17 @@
 
         let data = localStorage.getItem("data");
         if (data && data !== "") {
-            body.append(document.createRange().createContextualFragment(data));
+            body.prepend(document.createRange().createContextualFragment(data));
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id.indexOf("btn") > -1) {
+                    let id = e.target.id;
+                    let tableIndex = id.substr(3, 1);
+                    let rowIndex = id.substr(4, 1);
+                    if (tableIndex && rowIndex) {
+                        countDown(tableIndex, rowIndex);
+                    }
+                }
+            });
         } else {
             data = "";
             generateData();
