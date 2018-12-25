@@ -61,16 +61,22 @@
 
         function countDown(table, column) {
             let td = document.getElementById(`cell${table}${column}`);
-            let deadline = document.getElementById(`deadline`);
-            td.innerText = `${parseInt(deadline.value) * 60}`;
             let btn = document.getElementById(`btn${table}${column}`);
-            btn.disabled = true;
+
+            if (btn.innerText === "Start") {
+                let deadline = document.getElementById(`deadline`);
+                td.innerText = `${parseInt(deadline.value) * 60}`;
+                btn.innerText = "Done";
+            } else {
+                btn.disabled = true;
+                clearInterval(window.runningInterval[table]);
+                return;
+            }
+
             let si = setInterval((cell, tableIndex, startButton) => {
                 let i = parseInt(cell.innerText);
-                console.log(i);
                 if (i < 1) {
                     i = 1;
-                    btn.disabled = false;
                     clearInterval(window.runningInterval[tableIndex]);
                 }
                 cell.innerText = i - 1;
