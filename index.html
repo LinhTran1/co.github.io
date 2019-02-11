@@ -52,10 +52,11 @@
             }
         }
 
-        let tableAmount = 4;
+        let tableAmount = 3;
         let tableColumn = 6;
         let totalNumbers = 5;
         let maxNumber = 9;
+        let maxTotal = 9;
 
         window.runningInterval = new Array(tableAmount);
 
@@ -96,7 +97,7 @@
 
                         if (k === 0) {
                             column.className = "header";
-                            column.innerHTML = h + 1;
+                            column.innerHTML = `${i}.${h + 1}`;
                             row.append(column);
                             continue;
                         }
@@ -106,39 +107,28 @@
                         for (let t = 0; t < totalNumbers; t = t + 1) {
                             let num = Math.floor(Math.random() * maxNumber);
 
+                            //Make num to be negative or positive
+                            if (Math.floor((Math.random() * 2) + 1) == 2) {
+                                num = parseInt(`-${num}`);
+                            }
+
                             //First number cannot be negative
                             if (t === 0 && num % 2 > 0) {
                                 t = t - 1;
                                 continue;
                             }
 
-                            // Calculate total of generated number
-                            if (num % 2 > 0) {
-                                totalVal = totalVal - num;
-                            } else {
-                                totalVal = totalVal + num;
-                            }
-
-                            // If current totalVal is smaller than zero then regenerate
-                            if (totalVal < 0) {
-                                t = 0;
-                                exp = "";
-                                totalVal = 0;
+                            // If current totalVal + current num is smaller than zero then regenerate
+                            // or current totalVal + current num larger than maxTotal then to reject current num and also reloop
+                            if (totalVal + num < 0 || totalVal + num > maxTotal) {
+                                t = t - 1;
                                 continue;
                             }
 
-                            // At the last loop, totalVal must be fit in range of 0 to maxNumber
-                            // Otherwise reset
-                            if (t === totalNumbers - 1 && (totalVal < 0 ||
-                                    totalVal >= maxNumber)) {
-                                t = 0;
-                                exp = "";
-                                totalVal = 0;
-                                continue;
-                            }
+                            //Recalculate totalVal
+                            totalVal = totalVal + num;
 
-                            exp = exp +
-                                `${num % 2 > 0 ? "-" : ""}${num}<br />`;
+                            exp = exp + `${num}<br />`;
                         }
 
                         column.innerHTML = exp;
