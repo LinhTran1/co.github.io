@@ -58,6 +58,8 @@
         let totalNumbers = 4;
         let maxNumber = 9;
         let maxTotal = 99;
+        //If maxTotal of an expression is larger than 10, then skip new number if it is in list
+        let ignoreIfLargeTotal = [10, [-9, -8, -7, -6]];
 
         window.runningInterval = new Array(tableAmount);
 
@@ -124,6 +126,17 @@
                             if (totalVal + num < 0 || totalVal + num > maxTotal) {
                                 t = t - 1;
                                 continue;
+                            }
+                            
+                            if(ignoreIfLargeTotal && ignoreIfLargeTotal.length == 2) {
+                                //If current totalVal + current num is larger than or equal first element of ignoreIfLargeTotal
+                                if(totalVal + num >= ignoreIfLargeTotal[0]) {
+                                    //Then apply filter
+                                    if(ignoreIfLargeTotal[1].indexOf(num) >= 0) {
+                                        t = t - 1;
+                                        continue;
+                                    }
+                                }
                             }
 
                             //Recalculate totalVal
