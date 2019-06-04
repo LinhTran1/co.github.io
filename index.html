@@ -130,7 +130,7 @@
                             
                             if(ignoreIfLargeTotal && ignoreIfLargeTotal.length == 2) {
                                 //If current totalVal + current num is larger than or equal first element of ignoreIfLargeTotal
-                                if(totalVal + num >= ignoreIfLargeTotal[0]) {
+                                if(totalVal >= ignoreIfLargeTotal[0]) {
                                     //Then apply filter
                                     if(ignoreIfLargeTotal[1].indexOf(num) >= 0) {
                                         t = t - 1;
